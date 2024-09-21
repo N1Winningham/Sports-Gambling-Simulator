@@ -1,2 +1,2 @@
 # Sports-Gambling-Simulator
-Sports Betting Simulator
+Generated Sports Betting Simulator Code
