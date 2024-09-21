@@ -122,12 +122,13 @@ class Player:
     def place_bet(self, amount):
         if amount <= self.balance:
             self.balance -= amount
+            #self.net_gains -= amount #Update net gains
             return True
         return False
 
     def add_winnings(self, amount):
         self.balance += amount
-        self.net_gains += amount  # Update net gains
+        #self.net_gains += amount  # Update net gains
 
     def deposit(self, amount):
         if amount < 0:
@@ -145,7 +146,7 @@ class Player:
             print("Insufficient funds for withdrawal.")
         else:
             self.balance -= amount
-            self.net_gains -= amount  # Update net gains
+            self.net_gains += amount  # Update net gains
             print(f"${amount:.2f} withdrawn from {self.name}'s profile.")
 
     def display_net_gains(self):
@@ -252,7 +253,7 @@ class BettingGame:
                 while True:
                     try:
                         bet_amount = float(input("Enter bet amount: $"))
-                        if bet_amount <= 0 or bet_amount > self.logged_in_player.get_balance():
+                        if bet_amount <= 0 or bet_amount > self.logged_in_player.get_balance()+1:
                             raise ValueError
                         break
                     except ValueError:
