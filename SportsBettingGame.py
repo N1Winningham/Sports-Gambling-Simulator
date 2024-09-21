@@ -37,7 +37,7 @@ class Match:
         # Calculate odds based on the team standings
         self.odds_team1, self.odds_team2 = self.generate_odds()
 
-        # Assign scores to ensure a winner
+        # Assign scores to allow for both teams to have chances of winning
         self.score_team1, self.score_team2 = self.assign_scores()
 
         # Determine winner based on scores
@@ -75,8 +75,8 @@ class Match:
         return odds_team1, odds_team2
 
     def assign_scores(self):
-        score_team1 = random.randint(21, 50)  # Random score for team 1
-        score_team2 = random.randint(0, score_team1 - 1)  # Random score for team 2, ensuring it's lower
+        score_team1 = random.randint(0, 50)  # Random score for team 1
+        score_team2 = random.randint(0, 50)  # Random score for team 2
         return score_team1, score_team2
 
     def calculate_winnings(self, odds, bet_amount):
@@ -109,10 +109,12 @@ class Match:
         print(f"{player.name}'s updated balance: ${player.get_balance():.2f}")
         print(f"Score: {self.team1.name} {self.score_team1} - {self.team2.name} {self.score_team2}")
 
+
 class Player:
     def __init__(self, name, initial_balance):
         self.name = name
         self.balance = initial_balance
+        self.net_gains = 0  # Track net gains
 
     def get_balance(self):
         return self.balance
@@ -125,12 +127,14 @@ class Player:
 
     def add_winnings(self, amount):
         self.balance += amount
+        self.net_gains += amount  # Update net gains
 
     def deposit(self, amount):
         if amount < 0:
             print("Deposit amount must be positive.")
             return
         self.balance += amount
+        self.net_gains -= amount  # Update net gains
         print(f"${amount:.2f} deposited to {self.name}'s profile.")
 
     def withdraw(self, amount):
@@ -141,7 +145,11 @@ class Player:
             print("Insufficient funds for withdrawal.")
         else:
             self.balance -= amount
+            self.net_gains -= amount  # Update net gains
             print(f"${amount:.2f} withdrawn from {self.name}'s profile.")
+
+    def display_net_gains(self):
+        print(f"Net Gains for {self.name}'s profile = {self.net_gains:.2f}")
 
 
 class BettingGame:
@@ -155,8 +163,6 @@ class BettingGame:
     def add_player(self, name, initial_balance):
         if name in self.profiles:
             print("Profile with this name already exists.")
-        elif initial_balance <= 0:
-            print("Initial balance must be greater than zero.")
         else:
             self.profiles[name] = Player(name, initial_balance)
             print(f"Profile created for {name} with balance ${initial_balance:.2f}.")
@@ -299,20 +305,21 @@ class BettingGame:
             print("9. Withdraw money")
             print("10. Show team rankings")
             print("11. Show game score")
-            print("12. Quit")
+            print("12. Show net gain")
+            print("13. Quit")
 
             while True:
                 try:
                     choice = int(input("Choose an option: "))
-                    if choice < 1 or choice > 12:
+                    if choice < 1 or choice > 13:
                         raise ValueError
                     break
                 except ValueError:
-                    print("Invalid input. Please enter a number between 1 and 12.")
+                    print("Invalid input. Please enter a number between 1 and 13.")
 
             if choice == 1:
                 name = input("Enter profile name: ")
-                initial_balance = float(input("Enter starting balance: $"))
+                initial_balance = float(0.00)
                 self.add_player(name, initial_balance)
             elif choice == 2:
                 name = input("Enter profile name to delete: ")
@@ -346,6 +353,8 @@ class BettingGame:
             elif choice == 11:
                 self.show_game_score()
             elif choice == 12:
+                self.logged_in_player.display_net_gains()
+            elif choice == 13:
                 print("Exiting the game. Goodbye!")
                 break
             else:
